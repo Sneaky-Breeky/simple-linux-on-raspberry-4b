@@ -2,6 +2,9 @@
 #include "peripherals/mini_uart.h"
 #include "peripherals/gpio.h"
 
+#define SYS_CLOCK 5000000
+#define BAUD_RATE 115200
+
 void uart_send(char c) {
     while (1) {
         if (get32(AUX_MU_LSR_REG) & 0x20) {
@@ -60,7 +63,8 @@ void uart_init()
     // disable RTS line, althought it doesn't exist on pi4b
     put32(AUX_MU_MCR_REG, 0);
     // set baud rate
-    put32(AUX_MU_BAUD_REG, 270);
+    unsigned int baud_rate = (SYS_CLOCK / (8 * BAUD_RATE)) - 1;
+    put32(AUX_MU_BAUD_REG, baud_rate);
 
     // enable transmitter and receiver
     put32(AUX_MU_CNTL_REG, 3);
